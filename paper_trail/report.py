@@ -1,4 +1,4 @@
-"""Turn the graph into something I can read, paste somewhere, or draw."""
+"""turn the graph into something i can read or paste somewhere or draw"""
 
 from __future__ import annotations
 

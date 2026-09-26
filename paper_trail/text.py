@@ -1,4 +1,5 @@
-"""Splitting text into sentences. Used by both the parser and the report."""
+"""splitting text into sentences
+used by the parser and the report"""
 
 from __future__ import annotations
 

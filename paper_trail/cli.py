@@ -1,4 +1,5 @@
-"""The command line. Read the folder, print what is holding up what."""
+"""the command line
+read the folder and print what is holding up what"""
 
 from __future__ import annotations
 
@@ -37,7 +38,7 @@ def cmd_graph(args) -> int:
 
 
 def cmd_why(args) -> int:
-    """Everything that falls over if this paper turns out to be wrong."""
+    """everything that falls over if this paper turns out to be wrong"""
     papers, graph = load(args.folder)
     by_id = {p.id: p for p in papers}
     if args.paper not in graph.nodes:

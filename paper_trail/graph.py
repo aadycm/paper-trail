@@ -1,19 +1,25 @@
-"""The citation graph, and the three questions I actually want to ask it.
+"""the citation graph and the three questions i actually want to ask it
 
-Arrows go from the paper doing the citing to the paper being cited, so support
-flows the way they point. A paper is load-bearing when a lot of other work is
-sitting on top of it, directly or further down the chain.
+arrows go from the paper doing the citing to the paper being cited
+so support flows the way they point
+a paper is load bearing when a lot of other work sits on top of it
+either directly or further down the chain
 
-I report three numbers rather than one, because they disagree and the
-disagreement is the interesting part:
+i report three numbers instead of one because they disagree
+and the disagreement is the interesting part
 
-  * dependents - how many papers rest on this one in the end. Blunt, but it
-    is the closest thing to "what falls over if this is wrong".
-  * pagerank   - a citation from a paper everyone reads should count for more
-    than one from a preprint nobody opened.
-  * cut vertex - does removing it split the graph in two? A paper can have
-    one citation and still be the only way through to a whole branch, and the
-    first two numbers miss that completely.
+dependents
+how many papers rest on this one in the end
+blunt but its the closest thing to what falls over if this is wrong
+
+pagerank
+a citation from a paper everyone reads should count for more
+than one from a preprint nobody opened
+
+cut vertex
+does pulling it out split the graph in two
+a paper can have one citation and still be the only way through to a whole
+branch and the first two numbers miss that completely
 """
 
 from __future__ import annotations
@@ -25,16 +31,14 @@ from dataclasses import dataclass
 @dataclass
 class Node:
     id: str
-    known: bool = True          # False means someone cited it but I do not have it
+    known: bool = True # false means someone cited it but i dont have it
 
 
 class Graph:
     def __init__(self) -> None:
         self.nodes: dict[str, Node] = {}
-        self.out: dict[str, set[str]] = defaultdict(set)   # citing -> cited
-        self.inn: dict[str, set[str]] = defaultdict(set)   # cited  -> citing
-
-    # ------------------------------------------------------------ building
+        self.out: dict[str, set[str]] = defaultdict(set) # citing -> cited
+        self.inn: dict[str, set[str]] = defaultdict(set) # cited  -> citing
 
     def add_node(self, key: str, known: bool = True) -> None:
         node = self.nodes.get(key)
@@ -56,18 +60,16 @@ class Graph:
             g.add_node(p.id, known=True)
         for p in papers:
             for target in p.cites:
-                if target != p.id:          # citing yourself is not a dependency
+                if target != p.id: # citing yourself doesnt count as a dependency
                     g.add_edge(p.id, target)
         return g
 
-    # ------------------------------------------------------------- measures
-
     def dangling(self) -> list[str]:
-        """Papers that get cited but that I never actually saved."""
+        """papers that get cited but that i never actually saved"""
         return sorted(k for k, n in self.nodes.items() if not n.known)
 
     def dependents(self, key: str) -> set[str]:
-        """Everything that ends up resting on `key`, however far down the chain."""
+        """everything that ends up resting on key however far down the chain"""
         seen: set[str] = set()
         queue = deque(self.inn.get(key, ()))
         while queue:
@@ -103,12 +105,12 @@ class Graph:
         return rank
 
     def cut_vertices(self) -> set[str]:
-        """Find the papers that hold the graph together.
+        """find the papers that hold the graph together
 
-        Tarjan's articulation points, on the graph with the arrows ignored.
-        Written with an explicit stack rather than recursion, because a
-        reading list in one field is one long chain and that is exactly what
-        blows the recursion limit.
+        tarjans articulation points on the graph with the arrows ignored
+        written with an explicit stack instead of recursion
+        a reading list in one field is one long chain
+        and a long chain is exactly what blows the recursion limit
         """
         adj: dict[str, set[str]] = defaultdict(set)
         for src, targets in self.out.items():
@@ -156,10 +158,9 @@ class Graph:
                 cuts.add(root)
         return cuts
 
-    # -------------------------------------------------------------- summary
-
     def load_bearing(self) -> list[tuple[str, float, dict]]:
-        """Rank the papers by how much is sitting on them. (id, score, detail)."""
+        """rank the papers by how much is sitting on them
+        gives back id and score and detail"""
         rank = self.pagerank()
         cuts = self.cut_vertices()
         deps = {k: len(self.dependents(k)) for k in self.nodes}
@@ -178,19 +179,21 @@ class Graph:
             }
             score = 0.55 * (deps[key] / max_dep) + 0.45 * (rank[key] / max_rank)
             if detail["cut_vertex"]:
-                score += 0.15          # it is the only way through to a branch
+                score += 0.15 # it is the only way through to a branch
             rows.append((key, round(min(score, 1.0), 4), detail))
         rows.sort(key=lambda r: (-r[1], r[0]))
         return rows
 
     def cycles(self) -> list[list[str]]:
-        """Citation loops.
+        """citation loops
 
-        Papers cannot cite forward in time, so a loop means I typed a key
-        wrong somewhere. Better to see it than to quietly walk around it.
+        papers cant cite forward in time so a loop means i typed a key wrong
+        somewhere
+        better to see it than to quietly walk around it
         """
-        # Iterative on purpose, same reason as above: one field's reading list
-        # is a long chain, and a long chain is what kills a recursive walk.
+        # iterative on purpose for the same reason as above
+        # one fields reading list is a long chain
+        # and a long chain is what kills a recursive walk
         colour: dict[str, int] = {}
         found: list[list[str]] = []
 
@@ -204,7 +207,7 @@ class Graph:
             while stack:
                 node, children = stack[-1]
                 advanced = False
-                for nxt in children:                # type: ignore[union-attr]
+                for nxt in children: # type: ignore[union-attr]
                     state = colour.get(nxt, 0)
                     if state == 0:
                         colour[nxt] = 1

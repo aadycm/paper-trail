@@ -1,8 +1,8 @@
-"""Reads the folder of papers into something I can work with.
+"""reads the folder of papers into something i can work with
 
-A "paper" here is just a markdown file with a few lines of front matter at the
-top. I am after the graph, not PDF scraping, so the input is something I can
-type in half a minute while I am reading the thing anyway.
+a paper here is just a markdown file with a few lines of front matter on top
+im after the graph and not pdf scraping
+so the input is something i can type in half a minute while im reading anyway
 
     ---
     id: batchnorm2015
@@ -26,8 +26,8 @@ from .text import sentences
 FRONT_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n?", re.S)
 INLINE_CITE_RE = re.compile(r"\[\[([a-zA-Z0-9_-]+)\]\]")
 
-# Sentences where the paper is actually claiming something, which is what
-# everyone else ends up leaning on.
+# sentences where the paper is actually claiming something
+# which is what everyone else ends up leaning on
 CLAIM_PATTERNS = [
     (re.compile(r"\bwe (show|find|prove|observe|demonstrate|report)\b", re.I), "result"),
     (re.compile(r"\b(outperform|improves?|reduces?|achieves?|yields?|beats)\b", re.I), "result"),
@@ -87,14 +87,14 @@ def extract_claims(body: str) -> list[Claim]:
         for pattern, kind in CLAIM_PATTERNS:
             if pattern.search(sent):
                 found.append(Claim(kind, " ".join(sent.split())))
-                break          # one sentence, one claim - first pattern wins
+                break # one sentence one claim so the first pattern wins
     return found
 
 
 def parse_text(text: str, *, fallback_id: str = "", path: str = "") -> Paper:
     fields, body = parse_front_matter(text)
     cites = split_list(fields.get("cites", ""))
-    cites += INLINE_CITE_RE.findall(body)      # I also write [[key]] mid-sentence
+    cites += INLINE_CITE_RE.findall(body) # i also write [[key]] mid sentence
     seen, ordered = set(), []
     for c in cites:
         if c not in seen:
