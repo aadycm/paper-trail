@@ -1,0 +1,22 @@
+# the handout is mine, not part of the project
+handout.tex
+handout.pdf
+
+# latex leftovers, in case I build it in here
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# the index this builds at runtime
+.notes.db
+*.db
